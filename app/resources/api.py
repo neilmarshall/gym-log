@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restful import Resource
 
-app = Flask(__name__)
+from app.models import user
 
 class Register(Resource):
     def post(self):
