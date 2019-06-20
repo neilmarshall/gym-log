@@ -39,21 +39,17 @@ class TestGetTokenAccess(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.status_code, 201)
 
 
-@unittest.skip('tbc')
 class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
 
     def test_post_request_with_invalid_token_fails(self):
-        self.fail()
+        response = self.test_client.post('/api/add-record',
+                headers={'Authorization': 'Bearer invalid_token'})
+        self.assertEqual(response.status_code, 401)
 
-    def test_post_request_with_valid_token_succeeds(self):
-        self.fail()
 
-
-@unittest.skip('tbc')
 class TestGetRecordAccess(BaseTestClass, unittest.TestCase):
 
     def test_get_request_with_invalid_token_fails(self):
-        self.fail()
-
-    def test_get_request_with_valid_token_succeeds(self):
-        self.fail()
+        response = self.test_client.get('/api/get-record',
+                headers={'Authorization': 'Bearer invalid_token'})
+        self.assertEqual(response.status_code, 401)
