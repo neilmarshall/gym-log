@@ -1,3 +1,4 @@
+from base64 import b64encode
 import unittest
 
 from app.models.user import User
@@ -23,15 +24,22 @@ class TestRegisterAccess(BaseTestClass, unittest.TestCase):
 class TestGetTokenAccess(BaseTestClass, unittest.TestCase):
 
     def test_post_request_with_invalid_username_fails(self):
-        self.fail()
+        response = self.test_client.post('/api/get-token',
+                headers={'Authorization': b'Basic ' + b64encode(b'test:invalid')})
+        self.assertEqual(response.status_code, 401)
 
     def test_post_request_with_invalid_password_fails(self):
-        self.fail()
+        response = self.test_client.post('/api/get-token',
+                headers={'Authorization': b'Basic ' + b64encode(b'invalid:pass')})
+        self.assertEqual(response.status_code, 401)
 
     def test_post_request_with_valid_username_and_password_returns_token(self):
-        self.fail()
+        response = self.test_client.post('/api/get-token',
+                headers={'Authorization': b'Basic ' + b64encode(b'test:pass')})
+        self.assertEqual(response.status_code, 201)
 
 
+@unittest.skip('tbc')
 class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
 
     def test_post_request_with_invalid_token_fails(self):
@@ -41,6 +49,7 @@ class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
         self.fail()
 
 
+@unittest.skip('tbc')
 class TestGetRecordAccess(BaseTestClass, unittest.TestCase):
 
     def test_get_request_with_invalid_token_fails(self):
