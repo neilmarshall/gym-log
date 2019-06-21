@@ -5,6 +5,7 @@ from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_restful import Resource, reqparse
 
 from app import db
+from app.models.exercise import Exercise
 from app.models.user import User
 
 http_auth = HTTPBasicAuth()
