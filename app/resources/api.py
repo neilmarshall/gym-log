@@ -56,7 +56,25 @@ class GetToken(Resource):
 class AddRecord(Resource):
     @token_auth.login_required
     def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('date', type=self.parse_date, required=True, case_sensitive=False)
+        parser.add_argument('exercises', type=self.parse_exercises, required=True, case_sensitive=False)
+        data = parser.parse_args(strict=True)
         return {'hello': 'world'}
+
+    def parse_date(self, d):
+        return datetime.strptime(d, '%Y-%m-%d')
+
+    def parse_exercises(self, exercises):
+        try:
+            exercises = dict(exercises)
+            for exercise in exercises:
+                exercise_name = exercise['exercise name']
+                reps = exercise['reps']
+                weight = exercise['weight']
+            return exercises
+        except Exception:
+            raise ValueError('Badly formed record - please review structure')
 
 
 class GetRecord(Resource):
