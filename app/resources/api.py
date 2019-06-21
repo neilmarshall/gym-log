@@ -7,6 +7,7 @@ from flask_restful import Resource, reqparse
 from app import db
 from app.models.exercise import Exercise
 from app.models.user import User
+from app.models.session import Session
 
 http_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
