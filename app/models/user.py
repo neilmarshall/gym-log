@@ -17,7 +17,7 @@ class User(db.Model):
     token_expiry = db.Column(db.DateTime)
 
     def __repr__(self):
-        return f"User(username={self.username})"
+        return f"User(username='{self.username}')"
 
     def set_password(self, password):
         """Set a password for a user"""

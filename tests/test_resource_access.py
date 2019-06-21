@@ -12,6 +12,7 @@ class TestRegisterAccess(BaseTestClass, unittest.TestCase):
         response = self.test_client.post('/api/register', json=json)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(User.query.count(), 1)
+        self.assertEqual(response.json, "User(username='test')")
 
     def test_post_request_with_duplicate_username_fails(self):
         json = {"username": "test", "password": "pass"}
