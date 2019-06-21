@@ -8,7 +8,7 @@ class Exercise(db.Model):
     exercise_id = db.Column(db.Integer, primary_key=True)
     exercise_name = db.Column(db.String(128), unique=True, nullable=False)
 
-    records = db.relationship('gym_records', backref='exercise')
+    records = db.relationship('GymRecord', backref='exercise')
 
     def __repr__(self):
         return f"Exercise(exercise_name='{self.exercise_name}')"
