@@ -11,5 +11,7 @@ class Session(db.Model):
     date = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
+    records = db.relationship('gym_records', backref='session')
+
     def __repr__(self):
         return f"Session(date='{self.date}', user_id='{self.user_id}')"

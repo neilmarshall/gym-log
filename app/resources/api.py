@@ -6,6 +6,7 @@ from flask_restful import Resource, reqparse
 
 from app import db
 from app.models.exercise import Exercise
+from app.models.gym_record import GymRecord
 from app.models.user import User
 from app.models.session import Session
 
