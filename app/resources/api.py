@@ -1,8 +1,17 @@
 from flask import Flask, jsonify, make_response, request
+from flask_httpauth import HTTPBasicAuth
 from flask_restful import Resource, reqparse
 
 from app import db
 from app.models.user import User
+
+http_auth = HTTPBasicAuth()
+
+@http_auth.verify_password
+def verify_password(username, password):
+    user = User.query.filter_by(username=username).first()
+    return user is not None and user.check_password(password)
+
 
 class Register(Resource):
     def post(self):
@@ -21,8 +30,12 @@ class Register(Resource):
 
 
 class GetToken(Resource):
+    @http_auth.login_required
     def post(self):
-        return {'hello': 'world'}
+        user = User.query.filter(User.username == request.authorization.username).first()
+        user.set_token()
+        db.session.commit()
+        return make_response(jsonify({'token': user.access_token}), 201)
 
 
 class AddRecord(Resource):

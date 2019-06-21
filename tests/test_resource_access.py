@@ -24,6 +24,11 @@ class TestRegisterAccess(BaseTestClass, unittest.TestCase):
 
 class TestGetTokenAccess(BaseTestClass, unittest.TestCase):
 
+    def setUp(self):
+        super().setUp()
+        json = {"username": "test", "password": "pass"}
+        self.test_client.post('/api/register', json=json)
+
     def test_post_request_with_invalid_username_fails(self):
         response = self.test_client.post('/api/get-token',
                 headers={'Authorization': b'Basic ' + b64encode(b'test:invalid')})
@@ -38,6 +43,7 @@ class TestGetTokenAccess(BaseTestClass, unittest.TestCase):
         response = self.test_client.post('/api/get-token',
                 headers={'Authorization': b'Basic ' + b64encode(b'test:pass')})
         self.assertEqual(response.status_code, 201)
+        self.assertTrue('token' in response.json)
 
 
 class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
