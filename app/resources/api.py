@@ -11,6 +11,8 @@ class Register(Resource):
         parser.add_argument('password', required=True, case_sensitive=False)
         data = parser.parse_args(strict=True)
         username, password = data['username'], data['password']
+        if User.query.filter_by(username=username).first() is not None:
+            return make_response(jsonify("ERROR; Please select a unique username"), 409)
         user = User(username=username)
         user.set_password(password)
         db.session.add(user)
