@@ -17,6 +17,6 @@ class BaseTestClass():
         self.test_client = self.app.test_client()
         db.create_all()
 
-    def base_tear_down(self):
+    def tearDown(self):
         db.drop_all()
         self.app_context.pop()
