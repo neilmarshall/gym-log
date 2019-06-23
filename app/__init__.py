@@ -3,12 +3,14 @@ from flask_migrate import Migrate
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 
+from config import Config
+
 db = SQLAlchemy()
 migrate = Migrate()
 
 from app.resources.api import *
 
-def create_app(config_object):
+def create_app(config_object=Config):
     """Application Factory"""
     
     app = Flask(__name__)
