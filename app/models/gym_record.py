@@ -12,4 +12,5 @@ class GymRecord(db.Model):
     weight = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
-        return f"Exercise(exercise_name='{self.exercise_name}')"
+        return f"Exercise(session_id='{self.session_id}', exercise_id={self.exercise_id}, " + \
+               f"reps={self.reps}, weight={self.weight})"

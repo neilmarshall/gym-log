@@ -8,8 +8,8 @@ from flask_restful.inputs import date
 from app import db
 from app.models.exercise import Exercise
 from app.models.gym_record import GymRecord
-from app.models.user import User
 from app.models.session import Session
+from app.models.user import User
 
 http_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
@@ -31,17 +31,23 @@ def verify_token(access_token):
 
 class Register(Resource):
     def post(self):
+        # validate JSON data
         parser = reqparse.RequestParser()
         parser.add_argument('username', required=True, case_sensitive=False)
         parser.add_argument('password', required=True, case_sensitive=False)
         data = parser.parse_args(strict=True)
         username, password = data['username'], data['password']
+
+        # ensure username is unique
         if User.query.filter_by(username=username).first() is not None:
             return make_response(jsonify("ERROR; Please select a unique username"), 409)
+
+        # create new User object
         user = User(username=username)
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
+
         return make_response(jsonify(repr(user)), 201)
 
 
@@ -57,11 +63,32 @@ class GetToken(Resource):
 class AddRecord(Resource):
     @token_auth.login_required
     def post(self):
+        # validate JSON data
         parser = reqparse.RequestParser()
         parser.add_argument('date', type=date, required=True, case_sensitive=False, location='json')
         parser.add_argument('exercises', type=self.parse_exercises, required=True, case_sensitive=False, location='json')
         data = parser.parse_args(strict=True)
-        return {'hello': 'world'}
+
+        # create a gym session object
+        gym_session = Session(date=data['date'], user_id=g.current_user.id)
+        db.session.add(gym_session)
+        db.session.commit()
+
+        # create gym record objects and link the to the session
+        for exercise in data['exercises']:
+            exercise_id = db.session \
+                            .query(Exercise.exercise_id) \
+                            .filter_by(exercise_name = exercise['exercise name']) \
+                            .scalar()
+            for reps, weight in zip(exercise['reps'], exercise['weights']):
+                record = GymRecord(session_id=gym_session.session_id,
+                                   exercise_id=exercise_id,
+                                   reps=reps,
+                                   weight=weight)
+                db.session.add(record)
+                db.session.commit()
+
+        return make_response(jsonify({'Message': 'Record successfully created'}), 201)
 
     def parse_exercises(self, exercises):
         try:
