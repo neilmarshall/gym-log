@@ -56,12 +56,6 @@ class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
                 headers={'Authorization': 'Bearer invalid_token'})
         self.assertEqual(response.status_code, 401)
 
-    @unittest.skip('AddRecord resource needs to be implemented')
-    def test_post_request_with_valid_token_succeeds(self):
-        response = self.test_client.post('/api/add-record',
-                headers={'Authorization': 'Bearer ' + self.token})
-        self.assertEqual(response.status_code, 201)
-
 
 class TestGetRecordAccess(BaseTestClass, unittest.TestCase):
 
@@ -74,9 +68,3 @@ class TestGetRecordAccess(BaseTestClass, unittest.TestCase):
         response = self.test_client.get('/api/get-record',
                 headers={'Authorization': 'Bearer invalid_token'})
         self.assertEqual(response.status_code, 401)
-
-    @unittest.skip('GetRecord resource needs to be implemented')
-    def test_get_request_with_valid_token_succeeds(self):
-        response = self.test_client.get('/api/get-record',
-                headers={'Authorization': 'Bearer ' + self.token})
-        self.assertEqual(response.status_code, 201)
