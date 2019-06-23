@@ -6,7 +6,7 @@ from flask import jsonify
 
 from tests import BaseTestClass
 
-class TestRecordObject(BaseTestClass, unittest.TestCase):
+class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def setUp(self):
         super().setUp()
@@ -19,7 +19,7 @@ class TestRecordObject(BaseTestClass, unittest.TestCase):
                                     {"exercise name" : "exercise2", "reps": [6, 5], "weight": [100, 100]},
                                     {"exercise name" : "exercise3", "reps": [12, 10, 8, 6], "weight": [120, 100, 80, 60]}]}
 
-    def test_add_record_invalidates_missing_date(self):
+    def test_add_record_fails_on_missing_date(self):
         self.json.pop('date')
         response = self.test_client.post('/api/add-record',
                                          headers={'Authorization': 'Bearer ' + self.token},
@@ -27,7 +27,7 @@ class TestRecordObject(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue('date' in response.json['message'])
 
-    def test_add_record_invalidates_bad_date_format(self):
+    def test_add_record_fails_on_bad_date_format(self):
         self.json['date'] = "abc123"
         response = self.test_client.post('/api/add-record',
                                          headers={'Authorization': 'Bearer ' + self.token},
@@ -35,7 +35,7 @@ class TestRecordObject(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue('date' in response.json['message'])
 
-    def test_add_record_invalidates_missing_exercises(self):
+    def test_add_record_fails_on_missing_exercises(self):
         self.json.pop('exercises')
         response = self.test_client.post('/api/add-record',
                                          headers={'Authorization': 'Bearer ' + self.token},
@@ -43,7 +43,7 @@ class TestRecordObject(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue('exercises' in response.json['message'])
 
-    def test_add_record_invalidates_exercises_where_value_is_not_dict_like(self):
+    def test_add_record_fails_when_exercises_value_is_not_iterable(self):
         self.json['exercises'] = 42
         response = self.test_client.post('/api/add-record',
                                          headers={'Authorization': 'Bearer ' + self.token},
@@ -51,7 +51,7 @@ class TestRecordObject(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue('exercises' in response.json['message'])
 
-    def test_add_record_invalidates_exercises_where_value_does_not_contain_exercise_name(self):
+    def test_add_record_fails_when_exercises_value_does_not_contain_exercise_name(self):
         self.json['exercises'][0].pop('exercise name')
         response = self.test_client.post('/api/add-record',
                                          headers={'Authorization': 'Bearer ' + self.token},
@@ -59,7 +59,7 @@ class TestRecordObject(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue('exercises' in response.json['message'])
 
-    def test_add_record_invalidates_exercises_where_value_does_not_contain_reps(self):
+    def test_add_record_fails_when_exercises_value_does_not_contain_reps(self):
         self.json['exercises'][0].pop('reps')
         response = self.test_client.post('/api/add-record',
                                          headers={'Authorization': 'Bearer ' + self.token},
@@ -67,7 +67,7 @@ class TestRecordObject(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertTrue('exercises' in response.json['message'])
 
-    def test_add_record_invalidates_exercises_where_value_does_not_contain_weight(self):
+    def test_add_record_fails_when_exercises_value_does_not_contain_weight(self):
         self.json['exercises'][0].pop('weight')
         response = self.test_client.post('/api/add-record',
                                          headers={'Authorization': 'Bearer ' + self.token},
