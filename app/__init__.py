@@ -20,7 +20,7 @@ def create_app(config_object):
     api = Api(app)
     api.add_resource(AddExercise, '/api/add-exercise')
     api.add_resource(AddRecord, '/api/add-record')
-    api.add_resource(GetRecord, '/api/get-record')
+    api.add_resource(GetSessions, '/api/get-sessions')
     api.add_resource(GetToken, '/api/get-token')
     api.add_resource(Register, '/api/register')
 
