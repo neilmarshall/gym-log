@@ -16,6 +16,11 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
         self.token = self.test_client.post('/api/get-token',
                                            headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
+
+        for ex in ['exercise1', 'exercise2', 'exercise3']:
+            db.session.add(Exercise(exercise_name=ex))
+        db.session.commit()
+
         self.json = {"date" : "2019-06-30",
                      "exercises" : [{"exercise name" : "exercise1", "reps": [8, 8, 8], "weights": [100, 100, 100]},
                                     {"exercise name" : "exercise2", "reps": [6, 5], "weights": [100, 100]},
@@ -112,6 +117,15 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.json['message']['exercises'],
                          "invalid literal for int() with base 10: 'abc123'")
 
+    def test_add_record_fails_when_exercise_name_not_found(self):
+        self.json['exercises'][0]['exercise name'] = "abc123"
+        response = self.test_client.post('/api/add-record',
+                                         headers={'Authorization': 'Bearer ' + self.token},
+                                         json=self.json)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json['message']['exercises'],
+                         "Exercise 'abc123' not recognised - please add as an exercise")
+
 
 class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
 
@@ -121,9 +135,11 @@ class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
         self.token = self.test_client.post('/api/get-token',
                                            headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
+
         for ex in ['exercise1', 'exercise2', 'exercise3']:
             db.session.add(Exercise(exercise_name=ex))
         db.session.commit()
+
         self.json = {"date" : "2019-06-30",
                      "exercises" : [{"exercise name" : "exercise1", "reps": [8, 8, 8], "weights": [100, 100, 100]},
                                     {"exercise name" : "exercise2", "reps": [6, 5], "weights": [100, 100]},

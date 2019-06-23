@@ -94,6 +94,12 @@ class AddRecord(Resource):
         try:
             for exercise in exercises:
                 exercise_name = exercise['exercise name']
+                exercise_id = db.session \
+                                .query(Exercise.exercise_id) \
+                                .filter_by(exercise_name = exercise['exercise name']) \
+                                .scalar()
+                if exercise_id is None:
+                    raise ValueError(f"Exercise '{exercise_name}' not recognised - please add as an exercise")
                 reps = list(map(int, exercise['reps']))
                 weights = list(map(int, exercise['weights']))
                 if len(reps) != len(weights):
