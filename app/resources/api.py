@@ -8,7 +8,7 @@ from flask_restful.inputs import date
 from app import db
 from app.models.exercise import Exercise
 from app.models.gym_record import GymRecord
-from app.models.session import Session
+from app.models.session import ResponseObject, Session
 from app.models.user import User
 
 http_auth = HTTPBasicAuth()
@@ -135,8 +135,6 @@ class AddRecord(Resource):
 
 
 class GetSessions(Resource):
-    record_fields = {'reps': fields.List(fields.Integer)}
-
     @token_auth.login_required
     @marshal_with(fields={'session': {'date': fields.DateTime(dt_format='rfc822'),
                                       'username': fields.String(),
@@ -145,31 +143,4 @@ class GetSessions(Resource):
                                       'weights': fields.List(fields.List(fields.Integer()))}})
     def get(self):
         sessions = db.session.query(Session).filter_by(user_id = g.current_user.id).all()
-        response_objects = [ResponseObject(session) for session in sessions]
-        return response_objects
-
-
-class ResponseObject():
-    def __init__(self, session):
-        self.session = session
-        self.date = session.date
-        self.records = session.records
-        self.username = User.query.get(session.user_id).username
-        self.records = {}
-        for record in session.records:
-            exercise_name = db.session \
-                              .query(Exercise.exercise_name) \
-                              .filter_by(exercise_id = record.exercise_id) \
-                              .scalar()
-            if exercise_name in self.records:
-                self.records[exercise_name]['reps'].append(record.reps)
-                self.records[exercise_name]['weights'].append(record.weight)
-            else:
-                self.records[exercise_name] = {'reps': [record.reps],
-                                               'weights': [record.weight]}
-        self.exercises = list(self.records.keys())
-        self.reps = [self.records[e]['reps'] for e in self.records]
-        self.weights = [self.records[e]['weights'] for e in self.records]
-
-    def __repr__(self):
-        return f"ResponseObject({self.session})"
+        return [ResponseObject(session) for session in sessions]
