@@ -44,12 +44,15 @@ class TestGetTokenAccess(BaseTestClass, unittest.TestCase):
         self.assertTrue('token' in response.json)
 
 
-class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
+class TestAddExerciseAccess(BaseTestClass, unittest.TestCase):
 
-    def setUp(self):
-        super().setUp()
-        self.test_client.post('/api/register', json={"username": "test", "password": "pass"})
-        self.token = self.test_client.post('/api/get-token', headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}).json['token']
+    def test_post_request_with_invalid_token_fails(self):
+        response = self.test_client.post('/api/add-exercise',
+                headers={'Authorization': 'Bearer invalid_token'})
+        self.assertEqual(response.status_code, 401)
+
+
+class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
 
     def test_post_request_with_invalid_token_fails(self):
         response = self.test_client.post('/api/add-record',
@@ -58,11 +61,6 @@ class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
 
 
 class TestGetRecordAccess(BaseTestClass, unittest.TestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.test_client.post('/api/register', json={"username": "test", "password": "pass"})
-        self.token = self.test_client.post('/api/get-token', headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}).json['token']
 
     def test_get_request_with_invalid_token_fails(self):
         response = self.test_client.get('/api/get-record',

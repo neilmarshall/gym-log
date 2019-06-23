@@ -60,6 +60,31 @@ class GetToken(Resource):
         return make_response(jsonify({'token': user.access_token}), 201)
 
 
+class AddExercise(Resource):
+    @token_auth.login_required
+    def post(self):
+        # validate JSON data
+        parser = reqparse.RequestParser()
+        parser.add_argument('exercises', type=self.parse_exercises, required=True, case_sensitive=False, location='json')
+        data = parser.parse_args(strict=True)
+
+        # create new Exercise object
+        for exercise_name in data['exercises']:
+            db.session.add(Exercise(exercise_name=exercise_name))
+        db.session.commit()
+        return make_response(jsonify({'Message': 'Exercises successfully created'}), 201)
+
+    def parse_exercises(self, exercises):
+        exercises = set(exercises if isinstance(exercises, list) else [exercises])
+        for exercise in exercises:
+            if db.session \
+                 .query(Exercise) \
+                 .filter_by(exercise_name = exercise) \
+                 .first() is not None:
+                raise ValueError(f"Error - '{exercise}' already exists in database")
+        return exercises
+
+
 class AddRecord(Resource):
     @token_auth.login_required
     def post(self):

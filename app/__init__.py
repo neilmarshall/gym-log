@@ -6,6 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 migrate = Migrate()
 
+from app.resources.api import *
+
 def create_app(config_object):
     """Application Factory"""
     
@@ -15,8 +17,8 @@ def create_app(config_object):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from app.resources.api import AddRecord, GetRecord, GetToken, Register
     api = Api(app)
+    api.add_resource(AddExercise, '/api/add-exercise')
     api.add_resource(AddRecord, '/api/add-record')
     api.add_resource(GetRecord, '/api/get-record')
     api.add_resource(GetToken, '/api/get-token')
