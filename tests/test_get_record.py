@@ -38,7 +38,7 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
         response = self.test_client.post('/api/add-record', headers={'Authorization': 'Bearer ' + self.token}, json=json2)
         response = self.test_client.post('/api/add-record', headers={'Authorization': 'Bearer ' + self.token}, json=json3)
 
-    def test_get_record_returns_formatted_data(self):
+    def test_get_sessions_returns_formatted_data(self):
         response = self.test_client.get('/api/get-sessions', headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(response.status_code, 200)
         sessions = response.json
@@ -64,3 +64,15 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
                           'exercises': ['exercise1', 'exercise2'],
                           'reps': [[8, 8, 8], [8, 7, 6]],
                           'weights': [[100, 100, 100], [100, 110, 120]]})
+
+    def test_get_single_session_returns_formatted_data(self):
+        response = self.test_client.get('/api/get-sessions/2', headers={'Authorization': 'Bearer ' + self.token})
+        self.assertEqual(response.status_code, 200)
+        session = response.json[0]
+
+        self.assertEqual(session['session'],
+                         {'date': 'Sun, 30 Jun 2019 00:00:00 -0000',
+                          'username': 'test',
+                          'exercises': ['exercise1', 'exercise3'],
+                          'reps': [[8, 8, 8], [12, 10, 8]],
+                          'weights': [[100, 100, 100], [120, 80, 60]]})

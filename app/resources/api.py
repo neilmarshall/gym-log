@@ -141,6 +141,9 @@ class GetSessions(Resource):
                                       'exercises': fields.List(fields.String()),
                                       'reps': fields.List(fields.List(fields.Integer())),
                                       'weights': fields.List(fields.List(fields.Integer()))}})
-    def get(self):
-        sessions = db.session.query(Session).filter_by(user_id = g.current_user.id).all()
+    def get(self, session_id=None):
+        if session_id is None:
+            sessions = db.session.query(Session).filter_by(user_id = g.current_user.id).all()
+        else:
+            sessions = db.session.query(Session).filter_by(session_id = session_id).filter_by(user_id = g.current_user.id).all()
         return [ResponseObject(session) for session in sessions]
