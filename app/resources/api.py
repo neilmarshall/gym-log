@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import Flask, g, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_restful import Resource, reqparse
+from flask_restful.inputs import date
 
 from app import db
 from app.models.exercise import Exercise
@@ -57,24 +58,20 @@ class AddRecord(Resource):
     @token_auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('date', type=self.parse_date, required=True, case_sensitive=False)
-        parser.add_argument('exercises', type=self.parse_exercises, required=True, case_sensitive=False)
+        parser.add_argument('date', type=date, required=True, case_sensitive=False)
+        parser.add_argument('exercises', type=self.parse_exercises, required=True, case_sensitive=False, location='json')
         data = parser.parse_args(strict=True)
         return {'hello': 'world'}
 
-    def parse_date(self, d):
-        return datetime.strptime(d, '%Y-%m-%d')
-
     def parse_exercises(self, exercises):
         try:
-            exercises = dict(exercises)
             for exercise in exercises:
                 exercise_name = exercise['exercise name']
                 reps = exercise['reps']
                 weight = exercise['weight']
             return exercises
-        except Exception:
-            raise ValueError('Badly formed record - please review structure')
+        except KeyError as e:
+            raise ValueError(f'Missing required parameter {e} in the JSON body')
 
 
 class GetRecord(Resource):
