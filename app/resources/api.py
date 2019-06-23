@@ -67,8 +67,10 @@ class AddRecord(Resource):
         try:
             for exercise in exercises:
                 exercise_name = exercise['exercise name']
-                reps = exercise['reps']
-                weight = exercise['weight']
+                reps = list(map(int, exercise['reps']))
+                weights = list(map(int, exercise['weights']))
+                if len(reps) != len(weights):
+                    raise ValueError(f"Mismatch between 'reps' ({reps}) and 'weights' ({weights})")
             return exercises
         except KeyError as e:
             raise ValueError(f'Missing required parameter {e} in the JSON body')

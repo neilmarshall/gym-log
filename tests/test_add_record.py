@@ -15,9 +15,9 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
                                            headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
         self.json = {"date" : "2019-06-30",
-                     "exercises" : [{"exercise name" : "exercise1", "reps": [8, 8, 8], "weight": [100, 100, 100]},
-                                    {"exercise name" : "exercise2", "reps": [6, 5], "weight": [100, 100]},
-                                    {"exercise name" : "exercise3", "reps": [12, 10, 8, 6], "weight": [120, 100, 80, 60]}]}
+                     "exercises" : [{"exercise name" : "exercise1", "reps": [8, 8, 8], "weights": [100, 100, 100]},
+                                    {"exercise name" : "exercise2", "reps": [6, 5], "weights": [100, 100]},
+                                    {"exercise name" : "exercise3", "reps": [12, 10, 8, 6], "weights": [120, 100, 80, 60]}]}
 
     def test_add_record_fails_on_missing_date(self):
         self.json.pop('date')
@@ -68,7 +68,31 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
         self.assertTrue('exercises' in response.json['message'])
 
     def test_add_record_fails_when_exercises_value_does_not_contain_weight(self):
-        self.json['exercises'][0].pop('weight')
+        self.json['exercises'][0].pop('weights')
+        response = self.test_client.post('/api/add-record',
+                                         headers={'Authorization': 'Bearer ' + self.token},
+                                         json=self.json)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('exercises' in response.json['message'])
+
+    def test_add_record_fails_when_exercises_value_has_length_mismatch_between_reps_and_weights(self):
+        self.json['exercises'][0]['reps'].append(99)
+        response = self.test_client.post('/api/add-record',
+                                         headers={'Authorization': 'Bearer ' + self.token},
+                                         json=self.json)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('exercises' in response.json['message'])
+
+    def test_add_record_fails_when_exercises_value_has_non_integer_reps(self):
+        self.json['exercises'][0]['reps'][0] = 'abc123'
+        response = self.test_client.post('/api/add-record',
+                                         headers={'Authorization': 'Bearer ' + self.token},
+                                         json=self.json)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('exercises' in response.json['message'])
+
+    def test_add_record_fails_when_exercises_value_has_non_integer_weights(self):
+        self.json['exercises'][0]['weights'][0] = 'abc123'
         response = self.test_client.post('/api/add-record',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
