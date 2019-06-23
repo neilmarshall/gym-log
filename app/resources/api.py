@@ -58,7 +58,7 @@ class AddRecord(Resource):
     @token_auth.login_required
     def post(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('date', type=date, required=True, case_sensitive=False)
+        parser.add_argument('date', type=date, required=True, case_sensitive=False, location='json')
         parser.add_argument('exercises', type=self.parse_exercises, required=True, case_sensitive=False, location='json')
         data = parser.parse_args(strict=True)
         return {'hello': 'world'}
