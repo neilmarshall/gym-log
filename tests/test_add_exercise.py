@@ -32,7 +32,7 @@ class TestAddExerciseJSONValidation(BaseTestClass, unittest.TestCase):
                                          json={"exercises" : "exercise1"})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json['message']['exercises'],
-                         "Error - 'exercise1' already exists in database")
+                         "Error - 'Exercise1' already exists in database")
 
     def test_add_exercise_does_not_add_duplicate_data_multiple_times(self):
         response = self.test_client.post('/api/add-exercise',
@@ -62,7 +62,7 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
         self.assertEqual(db.session.query(Exercise).count(), 1)
 
         exercise = db.session.query(Exercise).first()
-        self.assertEqual(exercise.exercise_name, "exercise1")
+        self.assertEqual(exercise.exercise_name, "Exercise1")
 
     def test_add_exercise_with_multiple_exercises_creates_exercises_in_database(self):
         response = self.test_client.post('/api/add-exercise',
@@ -75,5 +75,39 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
         self.assertEqual(db.session.query(Exercise).count(), 2)
 
         exercises = db.session.query(Exercise).order_by(Exercise.exercise_name).all()
-        self.assertEqual(exercises[0].exercise_name, "exercise1")
-        self.assertEqual(exercises[1].exercise_name, "exercise2")
+        self.assertEqual(exercises[0].exercise_name, "Exercise1")
+        self.assertEqual(exercises[1].exercise_name, "Exercise2")
+
+    def test_add_exercise_disregards_case(self):
+        response1 = self.test_client.post('/api/add-exercise',
+                                          headers={'Authorization': 'Bearer ' + self.token},
+                                          json={'exercises': 'exercise1'})
+        response2 = self.test_client.post('/api/add-exercise',
+                                          headers={'Authorization': 'Bearer ' + self.token},
+                                          json={'exercises': 'ExErCiSe1'})
+        self.assertEqual(response1.status_code, 201)
+        self.assertEqual(response1.json['Message'], 'Exercises successfully created')
+        self.assertEqual(response2.status_code, 400)
+        self.assertEqual(response2.json['message']['exercises'],
+                         "Error - 'Exercise1' already exists in database")
+        self.assertEqual(db.session.query(Exercise).count(), 1)
+
+    def test_add_exercise_converts_exercise_to_title_case(self):
+        response1 = self.test_client.post('/api/add-exercise',
+                                          headers={'Authorization': 'Bearer ' + self.token},
+                                          json={'exercises': 'test exercise'})
+        self.assertEqual(response1.status_code, 201)
+        self.assertEqual(response1.json['Message'], 'Exercises successfully created')
+        self.assertEqual(db.session.query(Exercise).first().exercise_name, 'Test Exercise')
+
+    def test_add_exercise_trims_whitespace(self):
+        response = self.test_client.post('/api/add-exercise',
+                                         headers={'Authorization': 'Bearer ' + self.token},
+                                         json={'exercises': [' exercise1', 'exercise2 ', ' exercise3 ']})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json['Message'], 'Exercises successfully created')
+        exercise_names = [e.exercise_name for e in db.session \
+                                                     .query(Exercise) \
+                                                     .order_by(Exercise.exercise_name) \
+                                                     .all()]
+        self.assertEqual(exercise_names, ['Exercise1', 'Exercise2', 'Exercise3'])
