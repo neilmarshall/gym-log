@@ -144,7 +144,16 @@ class GetSessions(Resource):
                                       'weights': fields.List(fields.List(fields.Integer()))}})
     def get(self, session_id=None):
         if session_id is None:
-            sessions = db.session.query(Session).filter_by(user_id = g.current_user.id).all()
+            sessions = db.session \
+                         .query(Session) \
+                         .filter_by(user_id = g.current_user.id) \
+                         .order_by(Session.date) \
+                         .all()
         else:
-            sessions = db.session.query(Session).filter_by(session_id = session_id).filter_by(user_id = g.current_user.id).all()
+            sessions = db.session \
+                         .query(Session) \
+                         .filter_by(session_id = session_id) \
+                         .filter_by(user_id = g.current_user.id) \
+                         .order_by(Session.date) \
+                         .all()
         return [ResponseObject(session) for session in sessions]
