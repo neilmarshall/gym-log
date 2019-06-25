@@ -53,7 +53,7 @@ class Register(Resource):
 
 class GetToken(Resource):
     @http_auth.login_required
-    def post(self):
+    def get(self):
         user = User.query.filter(User.username == request.authorization.username).first()
         user.set_token()
         db.session.commit()

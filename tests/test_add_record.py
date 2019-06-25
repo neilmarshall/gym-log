@@ -13,8 +13,8 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.post('/api/get-token',
-                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
+        self.token = self.test_client.get('/api/get-token',
+                                          headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
         for ex in ['exercise1', 'exercise2', 'exercise3']:
@@ -132,8 +132,8 @@ class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.post('/api/get-token',
-                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
+        self.token = self.test_client.get('/api/get-token',
+                                          headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
         for ex in ['exercise1', 'exercise2', 'exercise3']:

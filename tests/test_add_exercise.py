@@ -11,8 +11,8 @@ class TestAddExerciseJSONValidation(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.post('/api/get-token',
-                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
+        self.token = self.test_client.get('/api/get-token',
+                                          headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
     def test_add_exercise_fails_on_missing_data(self):
@@ -47,8 +47,8 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.post('/api/get-token',
-                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
+        self.token = self.test_client.get('/api/get-token',
+                                          headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
     def test_add_exercise_with_single_exercise_creates_exercise_in_database(self):
