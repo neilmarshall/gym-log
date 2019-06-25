@@ -26,10 +26,10 @@ if __name__ == '__main__':
          WHERE user_id IN (SELECT user_id
                              FROM sessions
                              JOIN users ON sessions.user_id = users.id
-                            GROUP BY id, date
+                            GROUP BY user_id, date
                            HAVING COUNT(*) > 1)
            AND date IN (SELECT date
                           FROM sessions
                           JOIN users ON sessions.user_id = users.id
-                         GROUP BY id, date
+                         GROUP BY user_id, date
                         HAVING COUNT(*) > 1);''')
