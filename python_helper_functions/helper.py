@@ -85,7 +85,7 @@ class SessionHelper(BaseHelper):
 
     @classmethod
     def create_random_session(cls):
-        date = datetime.date.fromordinal(random.randint(737060, 737424))
+        date = datetime.datetime.fromordinal(random.randint(737060, 737424))
         user =  UserHelper.get_random_user()
         return SessionHelper(date=date, user_id=user.id)
 
