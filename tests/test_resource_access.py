@@ -40,7 +40,7 @@ class TestGetTokenAccess(BaseTestClass, unittest.TestCase):
     def test_post_request_with_valid_username_and_password_returns_token(self):
         response = self.test_client.get('/api/get-token',
                 headers={'Authorization': b'Basic ' + b64encode(b'test:pass')})
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue('token' in response.json)
 
 

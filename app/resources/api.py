@@ -57,7 +57,7 @@ class GetToken(Resource):
         user = User.query.filter(User.username == request.authorization.username).first()
         user.set_token()
         db.session.commit()
-        return make_response(jsonify({'token': user.access_token}), 201)
+        return make_response(jsonify({'token': user.access_token}), 200)
 
 
 class AddExercise(Resource):
