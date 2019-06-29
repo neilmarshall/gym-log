@@ -66,7 +66,8 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
                           'weights': [[100, 100, 100], [100, 110, 120]]})
 
     def test_get_single_session_returns_formatted_data(self):
-        response = self.test_client.get('/api/get-sessions/2', headers={'Authorization': 'Bearer ' + self.token})
+        response = self.test_client.get('/api/get-sessions/2019-06-30',
+                headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(response.status_code, 200)
         session = response.json[0]
 
@@ -76,3 +77,16 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
                           'exercises': ['exercise1', 'exercise3'],
                           'reps': [[8, 8, 8], [12, 10, 8]],
                           'weights': [[100, 100, 100], [120, 80, 60]]})
+
+    def test_get_single_session_returns_nothing_if_date_not_in_data_set(self):
+        response = self.test_client.get('/api/get-sessions/2019-06-29',
+                headers={'Authorization': 'Bearer ' + self.token})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, [])
+
+    def test_get_single_session_returns_nothing_if_date_not_in_valid_format(self):
+        response = self.test_client.get('/api/get-sessions/2019-06-29xxx',
+                headers={'Authorization': 'Bearer ' + self.token})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json['message'],
+                "Bad date parameter provided '2019-06-29xxx' - could not be parsed in format 'YYYY-MM-DD'")

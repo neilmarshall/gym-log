@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
 
-from flask import Flask, g, jsonify, make_response, request
+from flask import abort, Flask, g, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_restful import fields, marshal_with, Resource, reqparse
 from flask_restful.inputs import date
@@ -148,18 +148,21 @@ class GetSessions(Resource):
                                       'exercises': fields.List(fields.String()),
                                       'reps': fields.List(fields.List(fields.Integer())),
                                       'weights': fields.List(fields.List(fields.Integer()))}})
-    def get(self, session_id=None):
-        if session_id is None:
+    def get(self, session_date=None):
+        if session_date is None:
             sessions = db.session \
                          .query(Session) \
                          .filter_by(user_id = g.current_user.id) \
                          .order_by(Session.date) \
                          .all()
         else:
-            sessions = db.session \
-                         .query(Session) \
-                         .filter_by(session_id = session_id) \
-                         .filter_by(user_id = g.current_user.id) \
-                         .order_by(Session.date) \
-                         .all()
+            try:
+                date = datetime.strptime(session_date, '%Y-%m-%d')
+                sessions = db.session \
+                             .query(Session) \
+                             .filter_by(date = date) \
+                             .filter_by(user_id = g.current_user.id) \
+                             .all()
+            except ValueError:
+                abort(400, f"Bad date parameter provided '{session_date}' - could not be parsed in format 'YYYY-MM-DD'")
         return [ResponseObject(session) for session in sessions]
