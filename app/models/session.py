@@ -1,6 +1,8 @@
 from datetime import datetime
 from itertools import groupby
 
+from sqlalchemy import UniqueConstraint
+
 from app import db
 from app.models.exercise import Exercise
 from app.models.gym_record import GymRecord
@@ -14,6 +16,8 @@ class Session(db.Model):
     session_id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+
+    __table_args__ = (UniqueConstraint('user_id', 'date'),)
 
     records = db.relationship('GymRecord', backref='session')
 

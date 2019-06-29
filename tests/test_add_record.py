@@ -126,6 +126,17 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.json['message']['exercises'],
                          "Exercise 'abc123' not recognised - please add as an exercise")
 
+    def test_add_record_fails_when_username_and_date_do_not_form_a_unique_pair(self):
+        self.test_client.post('/api/add-record',
+                              headers={'Authorization': 'Bearer ' + self.token},
+                              json=self.json)
+        response = self.test_client.post('/api/add-record',
+                                         headers={'Authorization': 'Bearer ' + self.token},
+                                         json=self.json)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json['message'], 'error: sessions must be unique across dates for each user')
+
+
 
 class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
 

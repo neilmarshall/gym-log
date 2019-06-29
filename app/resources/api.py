@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy.exc import IntegrityError
+
 from flask import Flask, g, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_restful import fields, marshal_with, Resource, reqparse
@@ -97,8 +99,12 @@ class AddRecord(Resource):
 
         # create a gym session object
         gym_session = Session(date=data['date'], user_id=g.current_user.id)
-        db.session.add(gym_session)
-        db.session.commit()
+        try:
+            db.session.add(gym_session)
+            db.session.commit()
+        except IntegrityError as e:
+            db.session.rollback()
+            return make_response(jsonify({'message': 'error: sessions must be unique across dates for each user'}), 400)
 
         # create gym record objects and link the to the session
         for exercise in data['exercises']:
