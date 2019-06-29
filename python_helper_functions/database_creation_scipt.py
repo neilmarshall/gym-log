@@ -2,19 +2,17 @@ import random
 
 from python_helper_functions.helper import *
 
-USERS_TO_CREATE = 6
-EXERCISES_TO_CREATE = 12
 SESSIONS_TO_CREATE = 120
 MIN_RECORDS_PER_SESSION = 1
 MAX_RECORDS_PER_SESSION = 8
 
 def create_database():
-    users = [UserHelper.create_random_user() for _ in range(USERS_TO_CREATE)]
-    for user in users:
+    random.seed(0)
+
+    for user in UserHelper.create_users():
         user.add_to_database()
 
-    exercises = [ExerciseHelper.create_random_exercise() for _ in range(EXERCISES_TO_CREATE)]
-    for exercise in exercises:
+    for exercise in ExerciseHelper.create_exercises():
         exercise.add_to_database()
 
     sessions = [SessionHelper.create_random_session() for _ in range(SESSIONS_TO_CREATE)]

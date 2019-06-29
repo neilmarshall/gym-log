@@ -33,7 +33,7 @@ class ExerciseHelper(BaseHelper):
         self.object = Exercise(exercise_name=exercise_name)
 
     @classmethod
-    def create_random_exercise(cls):
+    def create_exercises(cls):
         exercises = ['bulgarian split squat',
                      'cable flys',
                      'dumbbell bench press',
@@ -43,8 +43,8 @@ class ExerciseHelper(BaseHelper):
                      'seated row',
                      'tricep pushdown',
                      'underhand lat pulldown']
-        exercise = random.choice(exercises)
-        return cls(exercise)
+        for exercise in exercises:
+            yield cls(exercise)
 
     @classmethod
     def get_random_exercise(cls):
@@ -59,7 +59,7 @@ class UserHelper(BaseHelper):
         self.object.set_password(password)
 
     @classmethod
-    def create_random_user(cls):
+    def create_users(cls):
         users = [('Desiree Wartonby', 'dipodomysdeserti'),
                  ('Jorry Collibear', 'cebusapella'),
                  ('Candie Boatwright', 'pitangussulphuratus'),
@@ -68,8 +68,8 @@ class UserHelper(BaseHelper):
                  ('Max Breen', 'loxodontaafricana'),
                  ('Hadlee Poure', 'macropusrufogriseus'),
                  ('Carline MacVanamy', 'iguanaiguana')]
-        username, password = random.choice(users)
-        return cls(username, password)
+        for username, password in users:
+            yield cls(username, password)
 
     @classmethod
     def get_random_user(cls):
