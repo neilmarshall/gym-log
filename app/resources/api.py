@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
 
-from flask import abort, Flask, g, jsonify, make_response, request
+from flask import abort, Flask, g, request
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from flask_restful import fields, marshal_with, Resource, reqparse
 from flask_restful.inputs import date
@@ -42,7 +42,7 @@ class Register(Resource):
 
         # ensure username is unique
         if User.query.filter_by(username=username).first() is not None:
-            return make_response(jsonify("ERROR; Please select a unique username"), 409)
+            return "ERROR; Please select a unique username", 409
 
         # create new User object
         user = User(username=username)
@@ -50,7 +50,7 @@ class Register(Resource):
         db.session.add(user)
         db.session.commit()
 
-        return make_response(jsonify(repr(user)), 201)
+        return repr(user), 201
 
 
 class GetToken(Resource):
@@ -59,7 +59,7 @@ class GetToken(Resource):
         user = User.query.filter(User.username == request.authorization.username).first()
         user.set_token()
         db.session.commit()
-        return make_response(jsonify({'token': user.access_token}), 200)
+        return {'token': user.access_token}
 
 
 class AddExercise(Resource):
@@ -74,7 +74,7 @@ class AddExercise(Resource):
         for exercise_name in data['exercises']:
             db.session.add(Exercise(exercise_name=exercise_name))
         db.session.commit()
-        return make_response(jsonify({'Message': 'Exercises successfully created'}), 201)
+        return {'Message': 'Exercises successfully created'}, 201
 
     def parse_exercises(self, exercises):
         exercises = set(exercises if isinstance(exercises, list) else [exercises])
@@ -104,7 +104,7 @@ class AddRecord(Resource):
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            return make_response(jsonify({'message': 'error: sessions must be unique across dates for each user'}), 400)
+            return {'message': 'error: sessions must be unique across dates for each user'}, 400
 
         # create gym record objects and link the to the session
         for exercise in data['exercises']:
@@ -120,7 +120,7 @@ class AddRecord(Resource):
                 db.session.add(record)
                 db.session.commit()
 
-        return make_response(jsonify({'Message': 'Record successfully created'}), 201)
+        return {'Message': 'Record successfully created'}, 201
 
     def parse_exercises(self, exercises):
         try:
