@@ -8,9 +8,10 @@ from config import Config
 db = SQLAlchemy()
 migrate = Migrate()
 
-from app.resources.api import *
 from app.resources.add_exercise import AddExercise
 from app.resources.add_record import AddRecord
+from app.resources.delete_session import DeleteSession
+from app.resources.get_sessions import GetSessions
 from app.resources.get_token import GetToken
 from app.resources.register import Register
 
