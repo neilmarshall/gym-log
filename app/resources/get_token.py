@@ -3,7 +3,7 @@ from flask_restful import Resource
 
 from app import db
 from app.models.user import User
-from app.resources.api import http_auth
+from app.resources import http_auth
 
 class GetToken(Resource):
     @http_auth.login_required

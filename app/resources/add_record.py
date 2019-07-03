@@ -8,7 +8,7 @@ from app import db
 from app.models.exercise import Exercise
 from app.models.gym_record import GymRecord
 from app.models.session import Session
-from app.resources.api import token_auth
+from app.resources import token_auth
 
 class AddRecord(Resource):
     @token_auth.login_required

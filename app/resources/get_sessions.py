@@ -4,8 +4,8 @@ from flask import abort, g
 from flask_restful import fields, marshal_with, Resource
 
 from app import db
-from app.resources.api import token_auth
 from app.models.session import ResponseObject, Session
+from app.resources import token_auth
 
 class GetSessions(Resource):
     @token_auth.login_required

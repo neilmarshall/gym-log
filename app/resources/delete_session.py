@@ -5,9 +5,9 @@ from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 
 from app import db
-from app.resources.api import token_auth
 from app.models.gym_record import GymRecord
 from app.models.session import Session
+from app.resources import token_auth
 
 class DeleteSession(Resource):
     @token_auth.login_required

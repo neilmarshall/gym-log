@@ -2,7 +2,7 @@ from flask_restful import Resource, reqparse
 
 from app import db
 from app.models.exercise import Exercise
-from app.resources.api import token_auth
+from app.resources import token_auth
 
 class AddExercise(Resource):
     @token_auth.login_required
