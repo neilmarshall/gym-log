@@ -9,6 +9,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 from app.resources.api import *
+from app.resources.register import Register
 
 def create_app(config_object=Config):
     """Application Factory"""
