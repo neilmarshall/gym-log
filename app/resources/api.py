@@ -1,16 +1,8 @@
 from datetime import datetime
 
-from sqlalchemy.exc import IntegrityError
-
-from flask import abort, Flask, g, request
+from flask import g
 from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
-from flask_restful import fields, marshal_with, Resource, reqparse
-from flask_restful.inputs import date
 
-from app import db
-from app.models.exercise import Exercise
-from app.models.gym_record import GymRecord
-from app.models.session import ResponseObject, Session
 from app.models.user import User
 
 http_auth = HTTPBasicAuth()
