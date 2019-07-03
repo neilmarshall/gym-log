@@ -31,15 +31,6 @@ def verify_token(access_token):
     return True
 
 
-class GetToken(Resource):
-    @http_auth.login_required
-    def get(self):
-        user = User.query.filter(User.username == request.authorization.username).first()
-        user.set_token()
-        db.session.commit()
-        return {'token': user.access_token}
-
-
 class AddExercise(Resource):
     @token_auth.login_required
     def post(self):
