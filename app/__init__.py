@@ -9,6 +9,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 from app.resources.api import *
+from app.resources.add_exercise import AddExercise
 from app.resources.get_token import GetToken
 from app.resources.register import Register
 
