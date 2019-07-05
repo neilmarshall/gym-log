@@ -34,9 +34,9 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
                  "exercises" : [{"exercise name" : "exercise1", "reps": [8, 8, 8], "weights": [100, 100, 100]},
                                 {"exercise name" : "exercise2", "reps": [8, 7, 6], "weights": [100, 110, 120]}]}
 
-        response = self.test_client.post('/api/add-record', headers={'Authorization': 'Bearer ' + self.token}, json=json1)
-        response = self.test_client.post('/api/add-record', headers={'Authorization': 'Bearer ' + self.token}, json=json2)
-        response = self.test_client.post('/api/add-record', headers={'Authorization': 'Bearer ' + self.token}, json=json3)
+        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json1)
+        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json2)
+        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json3)
 
     def test_get_sessions_returns_formatted_data(self):
         response = self.test_client.get('/api/get-sessions', headers={'Authorization': 'Bearer ' + self.token})
