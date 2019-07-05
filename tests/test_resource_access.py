@@ -60,7 +60,15 @@ class TestAddRecordAccess(BaseTestClass, unittest.TestCase):
         self.assertEqual(response.status_code, 401)
 
 
-class TestGetRecordAccess(BaseTestClass, unittest.TestCase):
+class TestGetExercisesAccess(BaseTestClass, unittest.TestCase):
+
+    def test_get_request_with_invalid_token_fails(self):
+        response = self.test_client.get('/api/get-exercises',
+                headers={'Authorization': 'Bearer invalid_token'})
+        self.assertEqual(response.status_code, 401)
+
+
+class TestGetSessionsAccess(BaseTestClass, unittest.TestCase):
 
     def test_get_request_with_invalid_token_fails(self):
         response = self.test_client.get('/api/get-sessions',
