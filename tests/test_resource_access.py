@@ -66,3 +66,11 @@ class TestGetRecordAccess(BaseTestClass, unittest.TestCase):
         response = self.test_client.get('/api/get-sessions',
                 headers={'Authorization': 'Bearer invalid_token'})
         self.assertEqual(response.status_code, 401)
+
+
+class TestDeleteSessionAccess(BaseTestClass, unittest.TestCase):
+
+    def test_post_request_with_invalid_token_fails(self):
+        response = self.test_client.delete('/api/delete-session/2019-01-01',
+                headers={'Authorization': 'Bearer invalid_token'})
+        self.assertEqual(response.status_code, 401)
