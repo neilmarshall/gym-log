@@ -9,12 +9,10 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 from app.resources.add_exercise import AddExercise
-from app.resources.add_session import AddSession
-from app.resources.delete_session import DeleteSession
 from app.resources.get_exercises import GetExercises
-from app.resources.get_sessions import GetSessions
 from app.resources.get_token import GetToken
 from app.resources.register import Register
+from app.resources.sessions import Sessions
 
 def create_app(config_object=Config):
     """Application Factory"""
@@ -27,10 +25,8 @@ def create_app(config_object=Config):
 
     api = Api(app)
     api.add_resource(AddExercise, '/api/exercise')
-    api.add_resource(AddSession, '/api/sessions')
-    api.add_resource(DeleteSession, '/api/sessions/<session_date>')
+    api.add_resource(Sessions, '/api/sessions', '/api/sessions/<session_date>')
     api.add_resource(GetExercises, '/api/exercises')
-    api.add_resource(GetSessions, '/api/sessions', '/api/sessions/<session_date>')
     api.add_resource(GetToken, '/api/token')
     api.add_resource(Register, '/api/register')
 
