@@ -16,7 +16,7 @@ class TestAddExerciseJSONValidation(BaseTestClass, unittest.TestCase):
                                      .json.get('token')
 
     def test_add_exercise_fails_on_missing_data(self):
-        response = self.test_client.post('/api/exercise',
+        response = self.test_client.post('/api/exercises',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json={})
         self.assertEqual(response.status_code, 400)
@@ -24,10 +24,10 @@ class TestAddExerciseJSONValidation(BaseTestClass, unittest.TestCase):
                          "Missing required parameter in the JSON body")
 
     def test_add_exercise_fails_if_exercise_already_in_data(self):
-        self.test_client.post('/api/exercise',
+        self.test_client.post('/api/exercises',
                               headers={'Authorization': 'Bearer ' + self.token},
                               json={"exercises" : "exercise1"})
-        response = self.test_client.post('/api/exercise',
+        response = self.test_client.post('/api/exercises',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json={"exercises" : "exercise1"})
         self.assertEqual(response.status_code, 400)
@@ -35,7 +35,7 @@ class TestAddExerciseJSONValidation(BaseTestClass, unittest.TestCase):
                          "Error - 'Exercise1' already exists in database")
 
     def test_add_exercise_does_not_add_duplicate_data_multiple_times(self):
-        response = self.test_client.post('/api/exercise',
+        response = self.test_client.post('/api/exercises',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json={"exercises" : ["exercise1", "exercise1"]})
         self.assertEqual(response.status_code, 201)
@@ -52,7 +52,7 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
                                      .json.get('token')
 
     def test_add_exercise_with_single_exercise_creates_exercise_in_database(self):
-        response = self.test_client.post('/api/exercise',
+        response = self.test_client.post('/api/exercises',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json={'exercises': 'exercise1'})
 
@@ -65,7 +65,7 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
         self.assertEqual(exercise.exercise_name, "Exercise1")
 
     def test_add_exercise_with_multiple_exercises_creates_exercises_in_database(self):
-        response = self.test_client.post('/api/exercise',
+        response = self.test_client.post('/api/exercises',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json={'exercises': ['exercise1', 'exercise2']})
 
@@ -79,10 +79,10 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
         self.assertEqual(exercises[1].exercise_name, "Exercise2")
 
     def test_add_exercise_disregards_case(self):
-        response1 = self.test_client.post('/api/exercise',
+        response1 = self.test_client.post('/api/exercises',
                                           headers={'Authorization': 'Bearer ' + self.token},
                                           json={'exercises': 'exercise1'})
-        response2 = self.test_client.post('/api/exercise',
+        response2 = self.test_client.post('/api/exercises',
                                           headers={'Authorization': 'Bearer ' + self.token},
                                           json={'exercises': 'ExErCiSe1'})
         self.assertEqual(response1.status_code, 201)
@@ -93,7 +93,7 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
         self.assertEqual(db.session.query(Exercise).count(), 1)
 
     def test_add_exercise_converts_exercise_to_title_case(self):
-        response1 = self.test_client.post('/api/exercise',
+        response1 = self.test_client.post('/api/exercises',
                                           headers={'Authorization': 'Bearer ' + self.token},
                                           json={'exercises': 'test exercise'})
         self.assertEqual(response1.status_code, 201)
@@ -101,7 +101,7 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
         self.assertEqual(db.session.query(Exercise).first().exercise_name, 'Test Exercise')
 
     def test_add_exercise_trims_whitespace(self):
-        response = self.test_client.post('/api/exercise',
+        response = self.test_client.post('/api/exercises',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json={'exercises': [' exercise1', 'exercise2 ', ' exercise3 ']})
         self.assertEqual(response.status_code, 201)

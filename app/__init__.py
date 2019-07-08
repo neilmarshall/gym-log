@@ -8,8 +8,7 @@ from config import Config
 db = SQLAlchemy()
 migrate = Migrate()
 
-from app.resources.add_exercise import AddExercise
-from app.resources.get_exercises import GetExercises
+from app.resources.exercises import Exercises
 from app.resources.get_token import GetToken
 from app.resources.register import Register
 from app.resources.sessions import Sessions
@@ -24,9 +23,8 @@ def create_app(config_object=Config):
     migrate.init_app(app, db)
 
     api = Api(app)
-    api.add_resource(AddExercise, '/api/exercise')
+    api.add_resource(Exercises, '/api/exercises')
     api.add_resource(Sessions, '/api/sessions', '/api/sessions/<session_date>')
-    api.add_resource(GetExercises, '/api/exercises')
     api.add_resource(GetToken, '/api/token')
     api.add_resource(Register, '/api/register')
 
