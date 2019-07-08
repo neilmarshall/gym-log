@@ -13,7 +13,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.get('/api/get-token',
+        self.token = self.test_client.get('/api/token',
                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
@@ -28,7 +28,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_on_missing_date(self):
         self.json.pop('date')
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -37,7 +37,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_on_bad_date_format(self):
         self.json['date'] = "abc123"
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -46,7 +46,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_on_missing_exercises(self):
         self.json.pop('exercises')
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -55,7 +55,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_when_exercises_value_is_not_iterable(self):
         self.json['exercises'] = 42
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -64,7 +64,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_when_exercises_value_does_not_contain_exercise_name(self):
         self.json['exercises'][0].pop('exercise name')
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -73,7 +73,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_when_exercises_value_does_not_contain_reps(self):
         self.json['exercises'][0].pop('reps')
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -82,7 +82,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_when_exercises_value_does_not_contain_weight(self):
         self.json['exercises'][0].pop('weights')
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -91,7 +91,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_when_exercises_value_has_length_mismatch_between_reps_and_weights(self):
         self.json['exercises'][0]['reps'].append(99)
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -100,7 +100,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_when_exercises_value_has_non_integer_reps(self):
         self.json['exercises'][0]['reps'][0] = 'abc123'
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -110,7 +110,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_when_exercises_value_has_non_integer_weights(self):
         self.json['exercises'][0]['weights'][0] = 'abc123'
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -119,7 +119,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
 
     def test_add_record_fails_when_exercise_name_not_found(self):
         self.json['exercises'][0]['exercise name'] = "abc123"
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -127,10 +127,10 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
                          "Exercise 'abc123' not recognised - please add as an exercise")
 
     def test_add_record_fails_when_username_and_date_do_not_form_a_unique_pair(self):
-        self.test_client.post('/api/add-session',
+        self.test_client.post('/api/sessions',
                               headers={'Authorization': 'Bearer ' + self.token},
                               json=self.json)
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 400)
@@ -143,7 +143,7 @@ class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.get('/api/get-token',
+        self.token = self.test_client.get('/api/token',
                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
@@ -157,7 +157,7 @@ class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
                                     {"exercise name" : "exercise3", "reps": [12, 10, 8, 6], "weights": [120, 100, 80, 60]}]}
 
     def test_add_record_with_valid_data_creates_a_session(self):
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 201)
@@ -167,7 +167,7 @@ class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
         self.assertEqual(len(session.records), 9)
 
     def test_add_record_with_valid_data_back_populates_exercises(self):
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 201)
@@ -178,7 +178,7 @@ class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
         self.assertEqual(len(exercises[2].records), 4)
 
     def test_add_record_with_valid_data_creates_a_record(self):
-        response = self.test_client.post('/api/add-session',
+        response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
         self.assertEqual(response.status_code, 201)

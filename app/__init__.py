@@ -26,12 +26,12 @@ def create_app(config_object=Config):
     migrate.init_app(app, db)
 
     api = Api(app)
-    api.add_resource(AddExercise, '/api/add-exercise')
-    api.add_resource(AddSession, '/api/add-session')
-    api.add_resource(DeleteSession, '/api/delete-session/<session_date>')
-    api.add_resource(GetExercises, '/api/get-exercises')
-    api.add_resource(GetSessions, '/api/get-sessions', '/api/get-sessions/<session_date>')
-    api.add_resource(GetToken, '/api/get-token')
+    api.add_resource(AddExercise, '/api/exercise')
+    api.add_resource(AddSession, '/api/sessions')
+    api.add_resource(DeleteSession, '/api/sessions/<session_date>')
+    api.add_resource(GetExercises, '/api/exercises')
+    api.add_resource(GetSessions, '/api/sessions', '/api/sessions/<session_date>')
+    api.add_resource(GetToken, '/api/token')
     api.add_resource(Register, '/api/register')
 
     return app
