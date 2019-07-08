@@ -5,7 +5,8 @@ from app import db
 from app.models.user import User
 from app.resources import http_auth
 
-class GetToken(Resource):
+class Token(Resource):
+
     @http_auth.login_required
     def get(self):
         user = User.query.filter(User.username == request.authorization.username).first()
