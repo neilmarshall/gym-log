@@ -13,7 +13,7 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.get('/api/get-token',
+        self.token = self.test_client.get('/api/token',
                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
@@ -34,12 +34,12 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
                  "exercises" : [{"exercise name" : "exercise1", "reps": [8, 8, 8], "weights": [100, 100, 100]},
                                 {"exercise name" : "exercise2", "reps": [8, 7, 6], "weights": [100, 110, 120]}]}
 
-        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json1)
-        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json2)
-        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json3)
+        response = self.test_client.post('/api/sessions', headers={'Authorization': 'Bearer ' + self.token}, json=json1)
+        response = self.test_client.post('/api/sessions', headers={'Authorization': 'Bearer ' + self.token}, json=json2)
+        response = self.test_client.post('/api/sessions', headers={'Authorization': 'Bearer ' + self.token}, json=json3)
 
     def test_get_sessions_returns_formatted_data(self):
-        response = self.test_client.get('/api/get-sessions', headers={'Authorization': 'Bearer ' + self.token})
+        response = self.test_client.get('/api/sessions', headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(response.status_code, 200)
         sessions = response.json
         session1, session2, session3 = sessions
@@ -66,7 +66,7 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
                           'weights': [[100, 100, 100], [100, 110, 120]]})
 
     def test_get_single_session_returns_formatted_data(self):
-        response = self.test_client.get('/api/get-sessions/2019-06-30',
+        response = self.test_client.get('/api/sessions/2019-06-30',
                 headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(response.status_code, 200)
         session = response.json[0]
@@ -79,13 +79,13 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
                           'weights': [[100, 100, 100], [120, 80, 60]]})
 
     def test_get_single_session_returns_nothing_if_date_not_in_data_set(self):
-        response = self.test_client.get('/api/get-sessions/2019-06-29',
+        response = self.test_client.get('/api/sessions/2019-06-29',
                 headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, [])
 
     def test_get_single_session_returns_nothing_if_date_not_in_valid_format(self):
-        response = self.test_client.get('/api/get-sessions/2019-06-29xxx',
+        response = self.test_client.get('/api/sessions/2019-06-29xxx',
                 headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json['message'],

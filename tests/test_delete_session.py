@@ -15,7 +15,7 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.get('/api/get-token',
+        self.token = self.test_client.get('/api/token',
                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
@@ -36,13 +36,13 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
                  "exercises" : [{"exercise name" : "exercise1", "reps": [8, 8, 8], "weights": [100, 100, 100]},
                                 {"exercise name" : "exercise2", "reps": [8, 7, 6], "weights": [100, 110, 120]}]}
 
-        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json1)
-        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json2)
-        response = self.test_client.post('/api/add-session', headers={'Authorization': 'Bearer ' + self.token}, json=json3)
+        response = self.test_client.post('/api/sessions', headers={'Authorization': 'Bearer ' + self.token}, json=json1)
+        response = self.test_client.post('/api/sessions', headers={'Authorization': 'Bearer ' + self.token}, json=json2)
+        response = self.test_client.post('/api/sessions', headers={'Authorization': 'Bearer ' + self.token}, json=json3)
 
     def test_delete_session_with_valid_date_in_data_deletes_session(self):
         self.assertEqual(Session.query.count(), 3)
-        response = self.test_client.delete('/api/delete-session/2019-06-30',
+        response = self.test_client.delete('/api/sessions/2019-06-30',
                 headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(Session.query.count(), 2)
         self.assertEqual(response.status_code, 201)
@@ -50,7 +50,7 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
 
     def test_delete_session_with_valid_date_not_in_data_leaves_sessions_unchanged(self):
         self.assertEqual(Session.query.count(), 3)
-        response = self.test_client.delete('/api/delete-session/2019-06-29',
+        response = self.test_client.delete('/api/sessions/2019-06-29',
                 headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(Session.query.count(), 3)
         self.assertEqual(response.status_code, 400)
@@ -60,7 +60,7 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
     def test_delete_session_with_sql_failure_informs_user(self, MockDeleteSession):
         MockDeleteSession.side_effect = IntegrityError('', [], None)
         self.assertEqual(Session.query.count(), 3)
-        response = self.test_client.delete('/api/delete-session/2019-06-30',
+        response = self.test_client.delete('/api/sessions/2019-06-30',
                 headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(Session.query.count(), 3)
         self.assertEqual(response.status_code, 400)
@@ -68,7 +68,7 @@ class TestGetRecord(BaseTestClass, unittest.TestCase):
 
     def test_delete_session_with_invalid_date_leaves_sessions_unchanged(self):
         self.assertEqual(Session.query.count(), 3)
-        response = self.test_client.delete('/api/delete-session/2019-06-29xxx',
+        response = self.test_client.delete('/api/sessions/2019-06-29xxx',
                 headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(Session.query.count(), 3)
         self.assertEqual(response.status_code, 400)

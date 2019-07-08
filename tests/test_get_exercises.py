@@ -11,7 +11,7 @@ class TestGetExercises(BaseTestClass, unittest.TestCase):
     def setUp(self):
         super().setUp()
         self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
-        self.token = self.test_client.get('/api/get-token',
+        self.token = self.test_client.get('/api/token',
                                           headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
                                      .json.get('token')
 
@@ -20,6 +20,6 @@ class TestGetExercises(BaseTestClass, unittest.TestCase):
         db.session.commit()
 
     def test_get_exercises_returns_correct_exercises(self):
-        response = self.test_client.get('/api/get-exercises', headers={'Authorization': 'Bearer ' + self.token})
+        response = self.test_client.get('/api/exercises', headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, ['exercise1', 'exercise2', 'exercise3'])
