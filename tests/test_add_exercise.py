@@ -111,3 +111,15 @@ class TestAddExerciseCreatesExercise(BaseTestClass, unittest.TestCase):
                                                      .order_by(Exercise.exercise_name) \
                                                      .all()]
         self.assertEqual(exercise_names, ['Exercise1', 'Exercise2', 'Exercise3'])
+
+    def test_add_exercise_standardises_whitespace(self):
+        response = self.test_client.post('/api/exercises',
+                                         headers={'Authorization': 'Bearer ' + self.token},
+                                         json={'exercises': 'exercise            1'})
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json['Message'], 'Exercises successfully created')
+        exercise_names = [e.exercise_name for e in db.session \
+                                                     .query(Exercise) \
+                                                     .order_by(Exercise.exercise_name) \
+                                                     .all()]
+        self.assertEqual(exercise_names, ['Exercise 1'])
