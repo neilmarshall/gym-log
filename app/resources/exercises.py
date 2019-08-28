@@ -29,7 +29,7 @@ class Exercises(Resource):
 
     def parse_exercises(self, exercises):
         exercises = set(exercises if isinstance(exercises, list) else [exercises])
-        exercises = {e.title().strip() for e in exercises}
+        exercises = {' '.join(e.title().strip().split()) for e in exercises}
         for exercise in exercises:
             if db.session \
                  .query(Exercise) \
