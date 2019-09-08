@@ -28,7 +28,7 @@ class Exercises(Resource):
                  .query(Exercise) \
                  .filter_by(exercise_name = exercise) \
                  .first() is not None:
-                raise abort(409)
+                abort(409)
 
         # create new Exercise object
         for exercise_name in exercises:
@@ -39,5 +39,5 @@ class Exercises(Resource):
 
     def parse_exercises(self, exercises):
         exercises = exercises if isinstance(exercises, list) else [exercises]
-        exercises = [e.title().strip() for e in exercises]
+        exercises = [' '.join(e.title().strip().split()) for e in exercises]
         return tuple(sorted(set(exercises)))
