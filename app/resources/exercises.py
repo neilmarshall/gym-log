@@ -1,3 +1,4 @@
+from flask import abort, make_response, jsonify
 from flask_restful import Resource, reqparse
 
 from app import db
@@ -19,21 +20,24 @@ class Exercises(Resource):
         # validate JSON data
         parser = reqparse.RequestParser()
         parser.add_argument('exercises', type=self.parse_exercises, required=True, case_sensitive=False, location='json')
-        data = parser.parse_args(strict=True)
+        exercises = parser.parse_args(strict=True)['exercises']
 
-        # create new Exercise object
-        for exercise_name in data['exercises']:
-            db.session.add(Exercise(exercise_name=exercise_name))
-        db.session.commit()
-        return {'Message': 'Exercises successfully created'}, 201
-
-    def parse_exercises(self, exercises):
-        exercises = set(exercises if isinstance(exercises, list) else [exercises])
-        exercises = {e.title().strip() for e in exercises}
+        # return 409 if content duplicated
         for exercise in exercises:
             if db.session \
                  .query(Exercise) \
                  .filter_by(exercise_name = exercise) \
                  .first() is not None:
-                raise ValueError(f"Error - '{exercise}' already exists in database")
-        return exercises
+                raise abort(409)
+
+        # create new Exercise object
+        for exercise_name in exercises:
+            db.session.add(Exercise(exercise_name=exercise_name))
+        db.session.commit()
+
+        return exercises, 201
+
+    def parse_exercises(self, exercises):
+        exercises = exercises if isinstance(exercises, list) else [exercises]
+        exercises = [e.title().strip() for e in exercises]
+        return tuple(sorted(set(exercises)))
