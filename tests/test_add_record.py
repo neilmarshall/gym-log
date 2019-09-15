@@ -133,7 +133,7 @@ class TestAddRecordJSONValidation(BaseTestClass, unittest.TestCase):
         response = self.test_client.post('/api/sessions',
                                          headers={'Authorization': 'Bearer ' + self.token},
                                          json=self.json)
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 409)
         self.assertEqual(response.json['message'], 'error: sessions must be unique across dates for each user')
 
 

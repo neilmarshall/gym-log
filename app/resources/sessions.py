@@ -54,7 +54,7 @@ class Sessions(Resource):
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            return {'message': 'error: sessions must be unique across dates for each user'}, 400
+            return {'message': 'error: sessions must be unique across dates for each user'}, 409
 
         # create gym record objects and link the to the session
         for exercise in data['exercises']:
