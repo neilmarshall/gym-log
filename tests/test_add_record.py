@@ -194,3 +194,28 @@ class TestAddRecordCreatesRecord(BaseTestClass, unittest.TestCase):
         self.assertEqual(records[-1].exercise_id, 3)
         self.assertEqual(records[-1].reps, 6)
         self.assertEqual(records[-1].weight, 60)
+
+
+class TestIntegration(BaseTestClass, unittest.TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.test_client.post('/api/register', json={'username': 'test', 'password': 'pass'})
+        self.token = self.test_client.get('/api/token',
+                                          headers={'Authorization': b'Basic ' + b64encode(b'test:pass')}) \
+                                     .json.get('token')
+
+        for ex in ['Barbell Bench Press', 'Dumbell Bench Press', 'Dumbell Incline Bench Press']:
+            db.session.add(Exercise(exercise_name=ex))
+        db.session.commit()
+
+    def test_basic_case(self):
+        json = {'date': '2020-02-10',
+                'exercises':
+                   [{'exercise name': 'Barbell Bench Press', 'weights': [40, 40, 40], 'reps': [8, 8, 8]},
+                    {'exercise name': 'Dumbell Incline Bench Press', 'weights': [36, 36, 36], 'reps': [8, 8, 8]},
+                    {'exercise name': 'Dumbell Bench Press', 'weights': [40, 40, 40], 'reps': [6, 6, 6]}]}
+        response = self.test_client.post('/api/sessions',
+            headers={'Authorization': 'Bearer ' + self.token}, json=json)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json['Message'], 'Record successfully created')
