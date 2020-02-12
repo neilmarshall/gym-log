@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy.exc import IntegrityError
 
-from flask import abort, g
+from flask import abort, current_app, g
 from flask_restful import fields, marshal_with, Resource, reqparse
 from flask_restful.inputs import date
 
@@ -35,7 +35,8 @@ class Sessions(Resource):
                              .filter_by(date = date) \
                              .filter_by(user_id = g.current_user.id) \
                              .all()
-            except ValueError:
+            except ValueError as exn:
+                current_app.logger.error(exn.args)
                 abort(400, f"Bad date parameter provided '{session_date}' - could not be parsed in format 'YYYY-MM-DD'")
         return [ResponseObject(session) for session in sessions]
 
@@ -52,25 +53,29 @@ class Sessions(Resource):
         try:
             db.session.add(gym_session)
             db.session.commit()
-        except IntegrityError as e:
+        except IntegrityError as exn:
+            current_app.logger.error(exn.args)
             db.session.rollback()
             return {'message': 'error: sessions must be unique across dates for each user'}, 409
 
         # create gym record objects and link the to the session
-        for exercise in data['exercises']:
-            exercise_id = db.session \
-                            .query(Exercise.exercise_id) \
-                            .filter_by(exercise_name = exercise['exercise name']) \
-                            .scalar()
-            for reps, weight in zip(exercise['reps'], exercise['weights']):
-                record = GymRecord(session_id=gym_session.session_id,
-                                   exercise_id=exercise_id,
-                                   reps=reps,
-                                   weight=weight)
-                db.session.add(record)
-                db.session.commit()
-
-        return {'Message': 'Record successfully created'}, 201
+        try:
+            for exercise in data['exercises']:
+                exercise_id = db.session \
+                                .query(Exercise.exercise_id) \
+                                .filter_by(exercise_name = exercise['exercise name']) \
+                                .scalar()
+                for reps, weight in zip(exercise['reps'], exercise['weights']):
+                    record = GymRecord(session_id=gym_session.session_id,
+                                       exercise_id=exercise_id,
+                                       reps=reps,
+                                       weight=weight)
+                    db.session.add(record)
+                    db.session.commit()
+            return {'Message': 'Record successfully created'}, 201
+        except Exception as exn:
+            current_app.logger.error(exn.args)
+            abort(500)
 
     def parse_exercises(self, exercises):
         try:
@@ -87,8 +92,9 @@ class Sessions(Resource):
                 if len(reps) != len(weights):
                     raise ValueError(f"Mismatch between 'reps' ({reps}) and 'weights' ({weights})")
             return exercises
-        except KeyError as e:
-            raise ValueError(f'Missing required parameter {e} in the JSON body')
+        except KeyError as exn:
+            current_app.logger.error(exn.args)
+            raise ValueError(f'Missing required parameter {exn} in the JSON body')
 
     @token_auth.login_required
     def delete(self, session_date):
@@ -110,10 +116,12 @@ class Sessions(Resource):
                     db.session.delete(session)
                     db.session.commit()
                     return f"Session for user '{g.current_user.username}' on '{date.date()}' deleted", 201
-                except IntegrityError:
+                except IntegrityError as exn:
+                    current_app.logger.error(exn.args)
                     db.session.rollback()
                     abort(400, f"Session for user '{g.current_user.username}' on '{date.date()}' failed to delete")
             else:
                 abort(400, f"Session for user '{g.current_user.username}' on '{date.date()}' not found")
-        except ValueError:
+        except ValueError as exn:
+            current_app.logger.error(exn.args)
             abort(400, f"Bad date parameter provided '{session_date}' - could not be parsed in format 'YYYY-MM-DD'")
